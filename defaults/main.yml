@@ -1,2 +1,7 @@
 ---
 # defaults file for secure-droplet
+
+user_name: kungalex
+pw_hash: $6$XNofEzxQ9Ljf$8x3F3gxzTZE1cAJ/CRUB6942VHpgsoFm9w3d6za4XRg/s4meQaa4cgKpU2l0y9jyOeMTd/fiX2DnhoUmx3rD50 # abc123
+github_user: kungalex
+ssh_port: 22

@@ -1,2 +1,79 @@
 ---
 # tasks file for secure-droplet
+
+- name: 'Create and Add user to sudo group'
+  user:
+    name: "{{ user_name }}"
+    uid: 1040
+    password: "{{ pw_hash }}"
+    groups: sudo
+    shell: /bin/bash
+    append: yes
+
+#- name: Set authorized key for user copying it from current host user
+#  authorized_key:
+#    user: "{{ user_name }}"
+#    state: present
+#    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: Set authorized keys taken from url
+  authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    key: https://github.com/{{ github_user }}.keys
+
+- name: 'Update apt cache'
+  apt: update_cache=yes
+  become: yes
+
+- name: 'Install required software packages'
+  apt: name={{ item }} state=present
+  become: yes
+
+  with_items:
+    - fail2ban
+    - ufw
+
+- name: 'Setup ufw 22/tcp'
+  become: yes
+  command: ufw allow 22/tcp
+
+- name: 'Setup ufw 80/tcp'
+  become: yes
+  command: ufw allow 80/tcp
+
+- name: 'Setup ufw 443/tcp'
+  become: yes
+  command: ufw allow 443/tcp
+
+- name: 'Enable ufw'
+  become: yes
+  command: echo 'y' | ufw enable
+
+- name: 'Disable PAM authentication'
+  become: yes
+  action: lineinfile dest=/etc/ssh/sshd_config regexp="^UsePAM yes" line="UsePAM no" state=present
+
+- name: 'Disable password authentication'
+  become: yes
+  action: lineinfile dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
+
+- name: 'Disable root SSH access'
+  become: yes
+  action: lineinfile dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
+
+- name: 'Remove sudoers content'
+  file: path=/etc/sudoers.d/* state=absent
+  become: yes
+
+- name: 'Switch ssh port'
+  become: yes
+  action: lineinfile dest=/etc/ssh/sshd_config regexp="^Port" line="Port {{ ssh_port }}" state=present
+
+- name: 'restart ssh service'
+  become: yes
+  action: service name=ssh state=restarted
+
+- name: 'restart ufw service'
+  service: name=ufw state=restarted enabled=yes
+  become: yes
