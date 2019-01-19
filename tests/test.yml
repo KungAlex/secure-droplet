@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
   remote_user: root
-  roles:
-    - secure-droplet
+  vars_files:
+    - ../vars.yaml
+  tasks:
+    - include: ../tasks/main.yml

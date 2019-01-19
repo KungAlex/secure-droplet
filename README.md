@@ -1,13 +1,19 @@
-Role Name
-=========
+ [![Build Status](https://travis-ci.org/KungAlex/secure-droplet.svg?branch=master)](https://travis-ci.org/KungAlex/gitlab-docker-compose)
 
-A brief description of the role goes here.
+ 
+
+secure-droplet
+==============
+
+Secure a fresh Digitalocean Droplet 
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
+Set password variable in vars.yml  
+ 
+    mkpasswd --method=sha-512
+    
 Role Variables
 --------------
 
@@ -24,15 +30,25 @@ Example Playbook
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
     - hosts: servers
+    
+      vars_files:
+         - vars.yaml
+      
       roles:
-         - { role: username.rolename, x: 42 }
+         - kungalex.secure-droplet
+
+Test Local
+----------
+    vargrant up
+    vargrant provision
+    
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Alexander Kleinschmidt (kung4lex@gmail.com)
